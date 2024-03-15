@@ -1,6 +1,6 @@
-import { fetchFilteredCustomers } from '@/app/lib/data';
-import { customers } from '@/app/lib/placeholder-data';
-import CustomersTable from '@/app/ui/customers/table';
+import { fetchFilteredProjects } from '@/app/lib/data';
+import { projects } from '@/app/lib/placeholder-data';
+import ProjectsTable from '@/app/ui/projects/table';
 import { lusitana } from '@/app/ui/fonts';
 import Pagination from '@/app/ui/invoices/pagination';
 import Search from '@/app/ui/search';
@@ -15,10 +15,10 @@ export default async function Page({
   };
 }) {
   const query = searchParams?.query || '';
-  const customers = await fetchFilteredCustomers(query);
+  const projects = await fetchFilteredProjects(query);
   return (
     <Suspense fallback={<TableRowSkeleton />}>
-      <CustomersTable customers={customers} />
+      <ProjectsTable projects={projects} />
     </Suspense>
   );
 }

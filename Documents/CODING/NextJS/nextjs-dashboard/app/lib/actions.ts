@@ -8,8 +8,8 @@ import { AuthError } from 'next-auth';
 
 const FormSchema = z.object({
   id: z.string(),
-  customerId: z.string({
-    invalid_type_error: 'Please select a customer.',
+  projectId: z.string({
+    invalid_type_error: 'Please select a project.',
   }),
   amount: z.coerce
     .number()
@@ -19,12 +19,14 @@ const FormSchema = z.object({
   }),
   date: z.string(),
 });
-const FormSchemaCustomer = z.object({
+const FormSchemaProject = z.object({
   id: z.string(),
   name: z.string({
-    invalid_type_error: 'Please enter a customer name',
+    invalid_type_error: 'Please enter a project name',
   }),
-  email: z.string({ invalid_type_error: 'Please enter a valid email.' }),
+  priority: z.enum(['high', 'low', 'medium'], {
+    invalid_type_error: 'Please select a priority level',
+  }),
   imageUrl: z.string({
     invalid_type_error: 'Please select an image_url',
   }),
@@ -32,16 +34,16 @@ const FormSchemaCustomer = z.object({
 
 export type State = {
   errors?: {
-    customerId?: string[];
+    projectId?: string[];
     amount?: string[];
     status?: string[];
   };
   message?: string | null;
 };
-export type StateCustomer = {
+export type StateProject = {
   errors?: {
     name?: string[];
-    email?: string[];
+    priority?: string[];
     imageUrl?: string[];
   };
   message?: string | null;
@@ -49,12 +51,12 @@ export type StateCustomer = {
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
-const CreateCustomer = FormSchemaCustomer.omit({ id: true, date: true });
-const UpdateCustomer = FormSchemaCustomer.omit({ id: true, date: true });
+const CreateProject = FormSchemaProject.omit({ id: true, date: true });
+const UpdateProject = FormSchemaProject.omit({ id: true, date: true });
 
 export async function createInvoice(prevState: State, formData: FormData) {
   const validatedFields = CreateInvoice.safeParse({
-    customerId: formData.get('customerId'),
+    projectId: formData.get('projectId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
@@ -66,13 +68,13 @@ export async function createInvoice(prevState: State, formData: FormData) {
     };
   }
 
-  const { customerId, amount, status } = validatedFields.data;
+  const { projectId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split('T')[0];
   try {
     await sql`
-      INSERT INTO invoices (customer_id, amount, status, date)
-      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+      INSERT INTO invoices (project_id, amount, status, date)
+      VALUES (${projectId}, ${amountInCents}, ${status}, ${date})
     `;
   } catch (error) {
     return {
@@ -83,37 +85,37 @@ export async function createInvoice(prevState: State, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-export async function createCustomer(
-  prevState: StateCustomer,
+export async function createProject(
+  prevState: StateProject,
   formData: FormData,
 ) {
-  const validatedFields = CreateCustomer.safeParse({
+  const validatedFields = CreateProject.safeParse({
     name: formData.get('name'),
-    email: formData.get('email'),
+    priority: formData.get('priority'),
     imageUrl: formData.get('imageUrl'),
   });
 
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create customer.',
+      message: 'Missing Fields. Failed to Create project.',
     };
   }
 
-  const { name, email, imageUrl } = validatedFields.data;
+  const { name, priority, imageUrl } = validatedFields.data;
 
   try {
     await sql`
-        INSERT INTO customers (name, email, image_url)
-        VALUES (${name}, ${email}, ${imageUrl})
+        INSERT INTO projects (name, priority, image_url)
+        VALUES (${name}, ${priority}, ${imageUrl})
       `;
   } catch (error) {
     return {
-      message: 'Database Error: Failed to Create customer.',
+      message: 'Database Error: Failed to Create project.',
     };
   }
-  revalidatePath('/dashboard/customers');
-  redirect('/dashboard/customers');
+  revalidatePath('/dashboard/projects');
+  redirect('/dashboard/projects');
 }
 
 export async function updateInvoice(
@@ -122,7 +124,7 @@ export async function updateInvoice(
   formData: FormData,
 ) {
   const validatedFields = UpdateInvoice.safeParse({
-    customerId: formData.get('customerId'),
+    projectId: formData.get('projectId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
@@ -134,13 +136,13 @@ export async function updateInvoice(
     };
   }
 
-  const { customerId, amount, status } = validatedFields.data;
+  const { projectId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
 
   try {
     await sql`
         UPDATE invoices
-        SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+        SET project_id = ${projectId}, amount = ${amountInCents}, status = ${status}
         WHERE id = ${id}
       `;
   } catch (error) {
@@ -151,38 +153,38 @@ export async function updateInvoice(
   redirect('/dashboard/invoices');
 }
 
-export async function updateCustomer(
+export async function updateProject(
   id: string,
-  prevState: StateCustomer,
+  prevState: StateProject,
   formData: FormData,
 ) {
-  const validatedFields = UpdateCustomer.safeParse({
+  const validatedFields = UpdateProject.safeParse({
     name: formData.get('name'),
-    email: formData.get('email'),
+    priority: formData.get('priority'),
     imageUrl: formData.get('imageUrl'),
   });
 
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Update Customer.',
+      message: 'Missing Fields. Failed to Update project.',
     };
   }
 
-  const { name, email, imageUrl } = validatedFields.data;
+  const { name, priority, imageUrl } = validatedFields.data;
 
   try {
     await sql`
-          UPDATE customers
-          SET name = ${name}, email = ${email}, image_url = ${imageUrl}
+          UPDATE projects
+          SET name = ${name}, priority = ${priority}, image_url = ${imageUrl}
           WHERE id = ${id}
         `;
   } catch (error) {
-    return { message: 'Database Error: Failed to Update Customer.' };
+    return { message: 'Database Error: Failed to Update project.' };
   }
 
-  revalidatePath('/dashboard/customers');
-  redirect('/dashboard/customers');
+  revalidatePath('/dashboard/projects');
+  redirect('/dashboard/projects');
 }
 
 export async function deleteInvoice(id: string) {
@@ -194,13 +196,13 @@ export async function deleteInvoice(id: string) {
     return { message: 'Database Error: Failed to Delete Invoice.' };
   }
 }
-export async function deleteCustomer(id: string) {
+export async function deleteProject(id: string) {
   try {
-    await sql`DELETE FROM customers WHERE id = ${id}`;
-    revalidatePath('/dashboard/customers');
-    return { message: 'Deleted Customer.' };
+    await sql`DELETE FROM projects WHERE id = ${id}`;
+    revalidatePath('/dashboard/projects');
+    return { message: 'Deleted project.' };
   } catch (error) {
-    return { message: 'Database Error: Failed to Delete Customer.' };
+    return { message: 'Database Error: Failed to Delete Project.' };
   }
 }
 

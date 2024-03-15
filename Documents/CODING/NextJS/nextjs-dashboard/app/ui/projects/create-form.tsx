@@ -2,28 +2,19 @@
 
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { updateCustomer } from '@/app/lib/actions';
+import { createProject } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
-import { CustomerForm, Customer } from '@/app/lib/definitions';
 
-export default function EditCustomerForm({
-  customer,
-}: {
-  customer: CustomerForm;
-}) {
+export default function ProjectForm() {
   const initialState = { message: null, errors: {} };
-  const updateCustomerWithId = updateCustomer.bind(null, customer.id);
-  const [stateCustomer, dispatch] = useFormState(
-    updateCustomerWithId,
-    initialState,
-  );
+  const [state, dispatch] = useFormState(createProject, initialState);
   return (
     <form action={dispatch}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
+        {/* Project Name */}
         <div className="mb-4">
           <label htmlFor="name" className="mb-2 block text-sm font-medium">
-            Enter customer name
+            Enter project name
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
@@ -32,52 +23,50 @@ export default function EditCustomerForm({
                 name="name"
                 type="string"
                 step="0.01"
-                placeholder="Enter customer name"
+                placeholder="Enter project name"
                 aria-describedby="name-error"
-                defaultValue={customer.name}
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
             </div>
           </div>
-          {stateCustomer.errors?.name &&
-            stateCustomer.errors.name.map((error: string) => (
+          {state.errors?.name &&
+            state.errors.name.map((error: string) => (
               <p className="mt-2 text-sm text-red-500" key={error}>
                 {error}
               </p>
             ))}
         </div>
 
-        {/* Customer Email */}
+        {/* Project priority */}
         <div className="mb-4">
-          <label htmlFor="email" className="mb-2 block text-sm font-medium">
-            Enter email
+          <label htmlFor="priority" className="mb-2 block text-sm font-medium">
+            Enter priority
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
-                id="email"
-                name="email"
+                id="priority"
+                name="priority"
                 type="string"
                 step="0.01"
-                placeholder="Enter customer email"
-                defaultValue={customer.email}
-                aria-describedby="email-error"
+                placeholder="Enter project priority"
+                aria-describedby="priority-error"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
             </div>
           </div>
-          {stateCustomer.errors?.email &&
-            stateCustomer.errors.email.map((error: string) => (
+          {state.errors?.priority &&
+            state.errors.priority.map((error: string) => (
               <p className="mt-2 text-sm text-red-500" key={error}>
                 {error}
               </p>
             ))}
         </div>
 
-        {/* Customer Image */}
+        {/* Project Image */}
         <div className="mb-4">
           <label htmlFor="image" className="mb-2 block text-sm font-medium">
-            Enter customer image
+            Enter project image
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
@@ -87,14 +76,13 @@ export default function EditCustomerForm({
                 type="string"
                 step="0.01"
                 placeholder="Enter image url"
-                aria-describedby="imageUrl-error"
-                defaultValue={customer.image_url}
+                aria-describedby="image_url-error"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
             </div>
           </div>
-          {stateCustomer.errors?.imageUrl &&
-            stateCustomer.errors.imageUrl.map((error: string) => (
+          {state.errors?.imageUrl &&
+            state.errors.imageUrl.map((error: string) => (
               <p className="mt-2 text-sm text-red-500" key={error}>
                 {error}
               </p>
@@ -103,12 +91,12 @@ export default function EditCustomerForm({
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/customers"
+          href="/dashboard/projects"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel
         </Link>
-        <Button type="submit">Create Customer</Button>
+        <Button type="submit">Create project</Button>
       </div>
     </form>
   );

@@ -1,20 +1,20 @@
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
-import CustomerForm from '@/app/ui/customers/create-form';
+import ProjectForm from '@/app/ui/projects/create-form';
 
 export default async function Page() {
   return (
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'Customers', href: '/dashboard/customers' },
+          { label: 'Projects', href: '/dashboard/projects' },
           {
-            label: 'Create Customer',
-            href: '/dashboard/Customers/create',
+            label: 'Create Project',
+            href: '/dashboard/projects/create',
             active: true,
           },
         ]}
       />
-      <CustomerForm />
+      <ProjectForm />
     </main>
   );
 }

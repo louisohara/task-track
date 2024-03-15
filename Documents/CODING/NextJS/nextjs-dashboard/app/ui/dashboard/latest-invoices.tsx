@@ -39,7 +39,7 @@ export default async function LatestInvoices() {
                       {invoice.name}
                     </p>
                     <p className="hidden text-sm text-gray-500 sm:block">
-                      {invoice.email}
+                      {invoice.priority}
                     </p>
                   </div>
                 </div>
