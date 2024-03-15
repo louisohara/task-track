@@ -16,14 +16,15 @@ export type Project = {
   image_url: string;
 };
 
-export type Invoice = {
+export type Task = {
   id: string;
   project_id: string;
-  amount: number;
+  task: string;
+  due_date: string;
   date: string;
   // In TypeScript, this is called a string union type.
-  // It means that the "status" property can only be one of the two strings: 'pending' or 'paid'.
-  status: 'pending' | 'paid';
+  // It means that the "status" property can only be one of the two strings: 'pending' or 'completed'.
+  status: 'not started' | 'in progress' | 'completed';
 };
 
 export type Revenue = {
@@ -31,28 +32,23 @@ export type Revenue = {
   revenue: number;
 };
 
-export type LatestInvoice = {
+export type LatestTask = {
   id: string;
   name: string;
   image_url: string;
   priority: 'high' | 'medium' | 'low';
-  amount: string;
+  task: string;
 };
 
-// The database returns a number for amount, but we later format it to a string with the formatCurrency function
-export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
-  amount: number;
-};
-
-export type InvoicesTable = {
+export type TasksTable = {
   id: string;
   project_id: string;
   name: string;
   priority: 'high' | 'medium' | 'low';
   image_url: string;
   date: string;
-  amount: number;
-  status: 'pending' | 'paid';
+  task: string;
+  status: 'not started' | 'in progress' | 'completed';
 };
 
 export type ProjectsTableType = {
@@ -60,9 +56,9 @@ export type ProjectsTableType = {
   name: string;
   priority: 'high' | 'medium' | 'low';
   image_url: string;
-  total_invoices: number;
+  total_tasks: number;
   total_pending: number;
-  total_paid: number;
+  total_completed: number;
 };
 
 export type FormattedProjectsTable = {
@@ -70,9 +66,9 @@ export type FormattedProjectsTable = {
   name: string;
   priority: 'high' | 'medium' | 'low';
   image_url: string;
-  total_invoices: number;
+  total_tasks: number;
   total_pending: string;
-  total_paid: string;
+  total_completed: string;
 };
 
 export type ProjectField = {
@@ -80,11 +76,12 @@ export type ProjectField = {
   name: string;
 };
 
-export type InvoiceForm = {
+export type TaskForm = {
   id: string;
   project_id: string;
-  amount: number;
-  status: 'pending' | 'paid';
+  task: string;
+  status: 'not started' | 'in progress' | 'completed';
+  due_date: string;
 };
 export type ProjectForm = {
   id: string;

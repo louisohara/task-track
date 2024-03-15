@@ -1,5 +1,5 @@
 import Form from '@/app/ui/projects/edit-form';
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import Breadcrumbs from '@/app/ui/tasks/breadcrumbs';
 import { fetchProjectById } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
 import EditProjectForm from '@/app/ui/projects/edit-form';

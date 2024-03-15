@@ -11,11 +11,14 @@ const FormSchema = z.object({
   projectId: z.string({
     invalid_type_error: 'Please select a project.',
   }),
-  amount: z.coerce
-    .number()
-    .gt(0, { message: 'Please enter an amount greater than $0.' }),
-  status: z.enum(['pending', 'paid'], {
-    invalid_type_error: 'Please select an invoice status.',
+  task: z.string({
+    invalid_type_error: 'Please enter a task task',
+  }),
+  status: z.enum(['not started', 'in progress', 'completed'], {
+    invalid_type_error: 'Please select task progress status.',
+  }),
+  dueDate: z.string({
+    invalid_type_error: 'Please select a due date.',
   }),
   date: z.string(),
 });
@@ -35,8 +38,9 @@ const FormSchemaProject = z.object({
 export type State = {
   errors?: {
     projectId?: string[];
-    amount?: string[];
+    task?: string[];
     status?: string[];
+    dueDate?: string[];
   };
   message?: string | null;
 };
@@ -49,40 +53,41 @@ export type StateProject = {
   message?: string | null;
 };
 
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
-const UpdateInvoice = FormSchema.omit({ id: true, date: true });
+const CreateTask = FormSchema.omit({ id: true, date: true });
+const UpdateTask = FormSchema.omit({ id: true, date: true });
 const CreateProject = FormSchemaProject.omit({ id: true, date: true });
 const UpdateProject = FormSchemaProject.omit({ id: true, date: true });
 
-export async function createInvoice(prevState: State, formData: FormData) {
-  const validatedFields = CreateInvoice.safeParse({
+export async function createTask(prevState: State, formData: FormData) {
+  const validatedFields = CreateTask.safeParse({
     projectId: formData.get('projectId'),
-    amount: formData.get('amount'),
+    task: formData.get('task'),
     status: formData.get('status'),
+    dueDate: formData.get('dueDate'),
   });
 
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Invoice.',
+      message: 'Missing Fields. Failed to Create Task.',
     };
   }
 
-  const { projectId, amount, status } = validatedFields.data;
-  const amountInCents = amount * 100;
+  const { projectId, task, status, dueDate } = validatedFields.data;
+
   const date = new Date().toISOString().split('T')[0];
   try {
     await sql`
-      INSERT INTO invoices (project_id, amount, status, date)
-      VALUES (${projectId}, ${amountInCents}, ${status}, ${date})
+      INSERT INTO tasks (project_id, task, status, date, due_date)
+      VALUES (${projectId}, ${task}, ${status}, ${date}, ${dueDate})
     `;
   } catch (error) {
     return {
-      message: 'Database Error: Failed to Create Invoice.',
+      message: 'Database Error: Failed to Create Task.',
     };
   }
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/tasks');
+  redirect('/dashboard/tasks');
 }
 
 export async function createProject(
@@ -118,39 +123,39 @@ export async function createProject(
   redirect('/dashboard/projects');
 }
 
-export async function updateInvoice(
+export async function updateTask(
   id: string,
   prevState: State,
   formData: FormData,
 ) {
-  const validatedFields = UpdateInvoice.safeParse({
+  const validatedFields = UpdateTask.safeParse({
     projectId: formData.get('projectId'),
-    amount: formData.get('amount'),
+    task: formData.get('task'),
     status: formData.get('status'),
+    dueDate: formData.get('dueDate'),
   });
 
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Update Invoice.',
+      message: 'Missing Fields. Failed to Update Task.',
     };
   }
 
-  const { projectId, amount, status } = validatedFields.data;
-  const amountInCents = amount * 100;
+  const { projectId, task, status, dueDate } = validatedFields.data;
 
   try {
     await sql`
-        UPDATE invoices
-        SET project_id = ${projectId}, amount = ${amountInCents}, status = ${status}
+        UPDATE tasks
+        SET project_id = ${projectId}, task = ${task}, status = ${status}, due_date= ${dueDate}
         WHERE id = ${id}
       `;
   } catch (error) {
-    return { message: 'Database Error: Failed to Update Invoice.' };
+    return { message: 'Database Error: Failed to Update Task.' };
   }
 
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/tasks');
+  redirect('/dashboard/tasks');
 }
 
 export async function updateProject(
@@ -187,13 +192,13 @@ export async function updateProject(
   redirect('/dashboard/projects');
 }
 
-export async function deleteInvoice(id: string) {
+export async function deleteTask(id: string) {
   try {
-    await sql`DELETE FROM invoices WHERE id = ${id}`;
-    revalidatePath('/dashboard/invoices');
-    return { message: 'Deleted Invoice.' };
+    await sql`DELETE FROM tasks WHERE id = ${id}`;
+    revalidatePath('/dashboard/tasks');
+    return { message: 'Deleted Task.' };
   } catch (error) {
-    return { message: 'Database Error: Failed to Delete Invoice.' };
+    return { message: 'Database Error: Failed to Delete Task.' };
   }
 }
 export async function deleteProject(id: string) {

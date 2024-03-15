@@ -2,9 +2,9 @@ import { sql } from '@vercel/postgres';
 import {
   ProjectField,
   ProjectsTableType,
-  InvoiceForm,
-  InvoicesTable,
-  LatestInvoiceRaw,
+  TaskForm,
+  TasksTable,
+  LatestTask,
   User,
   Revenue,
   Project,
@@ -35,24 +35,23 @@ export async function fetchRevenue() {
   }
 }
 
-export async function fetchLatestInvoices() {
+export async function fetchLatestTasks() {
   noStore();
   try {
-    const data = await sql<LatestInvoiceRaw>`
-      SELECT invoices.amount, projects.name, projects.image_url, projects.priority, invoices.id
-      FROM invoices
-      JOIN projects ON invoices.project_id = projects.id
-      ORDER BY invoices.date DESC
+    const data = await sql<LatestTask>`
+      SELECT tasks.task, tasks.due_date, projects.name, projects.image_url, projects.priority, tasks.id
+      FROM tasks
+      JOIN projects ON tasks.project_id = projects.id
+      ORDER BY tasks.due_date DESC
       LIMIT 5`;
 
-    const latestInvoices = data.rows.map((invoice) => ({
-      ...invoice,
-      amount: formatCurrency(invoice.amount),
+    const latestTasks = data.rows.map((task) => ({
+      ...task,
     }));
-    return latestInvoices;
+    return latestTasks;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
+    throw new Error('Failed to fetch the latest tasks.');
   }
 }
 
@@ -62,29 +61,29 @@ export async function fetchCardData() {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
     // how to initialize multiple queries in parallel with JS.
-    const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
+    const taskCountPromise = sql`SELECT COUNT(*) FROM tasks`;
     const projectCountPromise = sql`SELECT COUNT(*) FROM projects`;
-    const invoiceStatusPromise = sql`SELECT
-         SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
-         SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
-         FROM invoices`;
+    const taskStatusPromise = sql`SELECT
+         SUM(CASE WHEN status = 'completed' THEN task ELSE 0 END) AS "completed",
+         SUM(CASE WHEN status = 'in progress' THEN task ELSE 0 END) AS "pending"
+         FROM tasks`;
 
     const data = await Promise.all([
-      invoiceCountPromise,
+      taskCountPromise,
       projectCountPromise,
-      invoiceStatusPromise,
+      taskStatusPromise,
     ]);
 
-    const numberOfInvoices = Number(data[0].rows[0].count ?? '0');
+    const numberOfTasks = Number(data[0].rows[0].count ?? '0');
     const numberOfProjects = Number(data[1].rows[0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(data[2].rows[0].paid ?? '0');
-    const totalPendingInvoices = formatCurrency(data[2].rows[0].pending ?? '0');
+    const totalCompletedTasks = Number(data[2].rows[0].completed.count ?? '0');
+    const totalPendingTasks = Number(data[2].rows[0].pending.count ?? '0');
 
     return {
       numberOfProjects,
-      numberOfInvoices,
-      totalPaidInvoices,
-      totalPendingInvoices,
+      numberOfTasks,
+      totalCompletedTasks,
+      totalPendingTasks,
     };
   } catch (error) {
     console.error('Database Error:', error);
@@ -93,87 +92,84 @@ export async function fetchCardData() {
 }
 
 const ITEMS_PER_PAGE = 6;
-export async function fetchFilteredInvoices(
-  query: string,
-  currentPage: number,
-) {
+export async function fetchFilteredTasks(query: string, currentPage: number) {
   noStore();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const invoices = await sql<InvoicesTable>`
+    const tasks = await sql<TasksTable>`
       SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
+        tasks.id,
+        tasks.task,
+        tasks.date,
+        tasks.due_date,
+        tasks.status,
         projects.name,
         projects.priority,
         projects.image_url
-      FROM invoices
-      JOIN projects ON invoices.project_id = projects.id
+      FROM tasks
+      JOIN projects ON tasks.project_id = projects.id
       WHERE
         projects.name ILIKE ${`%${query}%`} OR
         projects.priority ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
+        tasks.task ILIKE ${`%${query}%`} OR
+        tasks.date::text ILIKE ${`%${query}%`} OR
+        tasks.status ILIKE ${`%${query}%`}
+      ORDER BY tasks.due_date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
 
-    return invoices.rows;
+    return tasks.rows;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoices.');
+    throw new Error('Failed to fetch tasks.');
   }
 }
 
-export async function fetchInvoicesPages(query: string) {
+export async function fetchTasksPages(query: string) {
   noStore();
   try {
     const count = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN projects ON invoices.project_id = projects.id
+    FROM tasks
+    JOIN projects ON tasks.project_id = projects.id
     WHERE
       projects.name ILIKE ${`%${query}%`} OR
       projects.priority ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
+      tasks.task ILIKE ${`%${query}%`} OR
+      tasks.date::text ILIKE ${`%${query}%`} OR
+      tasks.status ILIKE ${`%${query}%`}
   `;
 
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
+    throw new Error('Failed to fetch total number of tasks.');
   }
 }
 
-export async function fetchInvoiceById(id: string) {
+export async function fetchTaskById(id: string) {
   noStore();
   try {
-    const data = await sql<InvoiceForm>`
+    const data = await sql<TaskForm>`
       SELECT
-        invoices.id,
-        invoices.project_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
+        tasks.id,
+        tasks.project_id,
+        tasks.task,
+        tasks.status,
+        tasks.due_date
+      FROM tasks
+      WHERE tasks.id = ${id};
     `;
 
-    const invoice = data.rows.map((invoice) => ({
-      ...invoice,
-      // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
+    const task = data.rows.map((task) => ({
+      ...task,
     }));
-    console.log(invoice);
-    return invoice[0];
+
+    return task[0];
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
+    throw new Error('Failed to fetch task.');
   }
 }
 
@@ -229,11 +225,11 @@ export async function fetchFilteredProjects(query: string) {
 		  projects.name,
 		  projects.priority,
 		  projects.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
+		  COUNT(tasks.id) AS total_tasks,
+		  SUM(CASE WHEN tasks.status = 'in progress' THEN tasks.task ELSE 0 END) AS total_pending,
+		  SUM(CASE WHEN tasks.status = 'completed' THEN tasks.task ELSE 0 END) AS total_completed
 		FROM projects
-		LEFT JOIN invoices ON projects.id = invoices.project_id
+		LEFT JOIN tasks ON projects.id = tasks.project_id
 		WHERE
 		  projects.name ILIKE ${`%${query}%`} OR
         projects.priority ILIKE ${`%${query}%`}
@@ -244,7 +240,7 @@ export async function fetchFilteredProjects(query: string) {
     const projects = data.rows.map((project) => ({
       ...project,
       total_pending: formatCurrency(project.total_pending),
-      total_paid: formatCurrency(project.total_paid),
+      total_completed: formatCurrency(project.total_completed),
     }));
 
     return projects;

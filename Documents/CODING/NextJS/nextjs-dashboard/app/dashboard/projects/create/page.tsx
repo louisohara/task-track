@@ -1,4 +1,4 @@
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import Breadcrumbs from '@/app/ui/tasks/breadcrumbs';
 import ProjectForm from '@/app/ui/projects/create-form';
 
 export default async function Page() {

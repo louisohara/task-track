@@ -15,7 +15,7 @@ export default async function ProjectsTable({
   return (
     <div className="w-full">
       <h1 className={`${lusitana.className} mb-8 text-xl md:text-2xl`}>
-        projects
+        Projects
       </h1>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search projects..." />
@@ -57,11 +57,11 @@ export default async function ProjectsTable({
                       </div>
                       <div className="flex w-1/2 flex-col">
                         <p className="text-xs">Paid</p>
-                        <p className="font-medium">{project.total_paid}</p>
+                        <p className="font-medium">{project.total_completed}</p>
                       </div>
                     </div>
                     <div className="pt-4 text-sm">
-                      <p>{project.total_invoices} invoices</p>
+                      <p>{project.total_tasks} tasks</p>
                     </div>
                     <div className="flex justify-end gap-2">
                       <UpdateProject id={project.id} />
@@ -80,13 +80,13 @@ export default async function ProjectsTable({
                       Priority
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      Total Invoices
+                      Total tasks
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      Total Pending
+                      Total pending
                     </th>
                     <th scope="col" className="px-4 py-5 font-medium">
-                      Total Paid
+                      Total completed
                     </th>
                   </tr>
                 </thead>
@@ -110,13 +110,13 @@ export default async function ProjectsTable({
                         {project.priority}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {project.total_invoices}
+                        {project.total_tasks}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {project.total_pending}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm ">
-                        {project.total_paid}
+                        {project.total_completed}
                       </td>
                       <td className="whitespace-nowrap py-5 pl-8 pr-4 group-first-of-type:rounded-md group-last-of-type:rounded-md">
                         <div className="flex justify-end gap-2">
