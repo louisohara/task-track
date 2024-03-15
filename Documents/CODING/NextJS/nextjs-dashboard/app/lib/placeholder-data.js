@@ -45,8 +45,8 @@ const projects = [
 const tasks = [
   {
     project_id: projects[0].id,
-    description: 'Random Task',
-    status: 'pending',
+    task: 'Random Task',
+    status: 'in progress',
     date: '2022-12-06',
     due_date: '2024-03-17',
   },
