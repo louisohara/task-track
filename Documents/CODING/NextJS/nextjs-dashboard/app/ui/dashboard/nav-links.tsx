@@ -1,6 +1,6 @@
 'use client';
 import {
-  UserGroupIcon,
+  FolderIcon,
   HomeIcon,
   DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
@@ -17,7 +17,7 @@ const links = [
     href: '/dashboard/tasks',
     icon: DocumentDuplicateIcon,
   },
-  { name: 'Projects', href: '/dashboard/projects', icon: UserGroupIcon },
+  { name: 'Projects', href: '/dashboard/projects', icon: FolderIcon },
 ];
 
 export default function NavLinks() {

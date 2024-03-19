@@ -1,10 +1,5 @@
 const { db } = require('@vercel/postgres');
-const {
-  tasks,
-  projects,
-  revenue,
-  users,
-} = require('../app/lib/placeholder-data.js');
+const { tasks, projects, users } = require('../app/lib/placeholder-data.js');
 
 const bcrypt = require('bcrypt');
 
@@ -98,7 +93,7 @@ async function seedProjects(client) {
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         priority VARCHAR(255) NOT NULL,
-        image_url VARCHAR(255) NOT NULL
+        color VARCHAR(255) NOT NULL
       );
     `;
 
@@ -108,8 +103,8 @@ async function seedProjects(client) {
     const insertedProjects = await Promise.all(
       projects.map(
         (project) => client.sql`
-        INSERT INTO projects (id, name, priority, image_url)
-        VALUES (${project.id}, ${project.name}, ${project.priority}, ${project.image_url})
+        INSERT INTO projects (id, name, priority, color)
+        VALUES (${project.id}, ${project.name}, ${project.priority}, ${project.color})
         ON CONFLICT (id) DO NOTHING;
       `,
       ),
@@ -127,49 +122,12 @@ async function seedProjects(client) {
   }
 }
 
-async function seedRevenue(client) {
-  try {
-    // Create the "revenue" table if it doesn't exist
-    const createTable = await client.sql`
-      CREATE TABLE IF NOT EXISTS revenue (
-        month VARCHAR(4) NOT NULL UNIQUE,
-        revenue INT NOT NULL
-      );
-    `;
-
-    console.log(`Created "revenue" table`);
-
-    // Insert data into the "revenue" table
-    const insertedRevenue = await Promise.all(
-      revenue.map(
-        (rev) => client.sql`
-        INSERT INTO revenue (month, revenue)
-        VALUES (${rev.month}, ${rev.revenue})
-        ON CONFLICT (month) DO NOTHING;
-      `,
-      ),
-    );
-
-    console.log(`Seeded ${insertedRevenue.length} revenue`);
-
-    return {
-      createTable,
-      revenue: insertedRevenue,
-    };
-  } catch (error) {
-    console.error('Error seeding revenue:', error);
-    throw error;
-  }
-}
-
 async function main() {
   const client = await db.connect();
 
   await seedUsers(client);
   await seedProjects(client);
   await seedTasks(client);
-  await seedRevenue(client);
-
   await client.end();
 }
 

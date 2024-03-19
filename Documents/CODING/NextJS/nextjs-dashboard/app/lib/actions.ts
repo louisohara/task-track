@@ -12,7 +12,7 @@ const FormSchema = z.object({
     invalid_type_error: 'Please select a project.',
   }),
   task: z.string({
-    invalid_type_error: 'Please enter a task task',
+    invalid_type_error: 'Please enter a task description',
   }),
   status: z.enum(['not started', 'in progress', 'completed'], {
     invalid_type_error: 'Please select task progress status.',
@@ -30,8 +30,8 @@ const FormSchemaProject = z.object({
   priority: z.enum(['high', 'low', 'medium'], {
     invalid_type_error: 'Please select a priority level',
   }),
-  imageUrl: z.string({
-    invalid_type_error: 'Please select an image_url',
+  color: z.string({
+    invalid_type_error: 'Please select a colour',
   }),
 });
 
@@ -48,7 +48,7 @@ export type StateProject = {
   errors?: {
     name?: string[];
     priority?: string[];
-    imageUrl?: string[];
+    color?: string[];
   };
   message?: string | null;
 };
@@ -94,10 +94,11 @@ export async function createProject(
   prevState: StateProject,
   formData: FormData,
 ) {
+  console.log(formData);
   const validatedFields = CreateProject.safeParse({
     name: formData.get('name'),
     priority: formData.get('priority'),
-    imageUrl: formData.get('imageUrl'),
+    color: formData.get('color'),
   });
 
   if (!validatedFields.success) {
@@ -107,12 +108,12 @@ export async function createProject(
     };
   }
 
-  const { name, priority, imageUrl } = validatedFields.data;
+  const { name, priority, color } = validatedFields.data;
 
   try {
     await sql`
-        INSERT INTO projects (name, priority, image_url)
-        VALUES (${name}, ${priority}, ${imageUrl})
+        INSERT INTO projects (name, priority, color)
+        VALUES (${name}, ${priority}, ${color})
       `;
   } catch (error) {
     return {
@@ -148,6 +149,7 @@ export async function updateTask(
     await sql`
         UPDATE tasks
         SET project_id = ${projectId}, task = ${task}, status = ${status}, due_date= ${dueDate}
+      
         WHERE id = ${id}
       `;
   } catch (error) {
@@ -166,7 +168,7 @@ export async function updateProject(
   const validatedFields = UpdateProject.safeParse({
     name: formData.get('name'),
     priority: formData.get('priority'),
-    imageUrl: formData.get('imageUrl'),
+    color: formData.get('color'),
   });
 
   if (!validatedFields.success) {
@@ -176,12 +178,12 @@ export async function updateProject(
     };
   }
 
-  const { name, priority, imageUrl } = validatedFields.data;
+  const { name, priority, color } = validatedFields.data;
 
   try {
     await sql`
           UPDATE projects
-          SET name = ${name}, priority = ${priority}, image_url = ${imageUrl}
+          SET name = ${name}, priority = ${priority}, color = ${color}
           WHERE id = ${id}
         `;
   } catch (error) {

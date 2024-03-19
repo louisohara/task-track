@@ -13,7 +13,7 @@ export type Project = {
   id: string;
   name: string;
   priority: 'high' | 'medium' | 'low';
-  image_url: string;
+  color: string;
 };
 
 export type Task = {
@@ -22,22 +22,35 @@ export type Task = {
   task: string;
   due_date: string;
   date: string;
-  // In TypeScript, this is called a string union type.
-  // It means that the "status" property can only be one of the two strings: 'pending' or 'completed'.
   status: 'not started' | 'in progress' | 'completed';
 };
 
-export type Revenue = {
-  month: string;
-  revenue: number;
+export type Events = {
+  id: string;
+  start: string;
+  end: string;
+  title: string;
+  color: string;
+  name: string;
+  project_id: string;
+};
+export type TaskDetails = {
+  id: string;
+  date: string;
+  due_date: string;
+  task: string;
+  color: string;
+  name: string;
+  project_id: string;
 };
 
 export type LatestTask = {
   id: string;
-  name: string;
-  image_url: string;
+  due_date: string;
+  color: string;
   priority: 'high' | 'medium' | 'low';
   task: string;
+  name: string;
 };
 
 export type TasksTable = {
@@ -45,8 +58,8 @@ export type TasksTable = {
   project_id: string;
   name: string;
   priority: 'high' | 'medium' | 'low';
-  image_url: string;
-  date: string;
+  color: string;
+  due_date: string;
   task: string;
   status: 'not started' | 'in progress' | 'completed';
 };
@@ -55,7 +68,7 @@ export type ProjectsTableType = {
   id: string;
   name: string;
   priority: 'high' | 'medium' | 'low';
-  image_url: string;
+  color: string;
   total_tasks: number;
   total_pending: number;
   total_completed: number;
@@ -65,10 +78,10 @@ export type FormattedProjectsTable = {
   id: string;
   name: string;
   priority: 'high' | 'medium' | 'low';
-  image_url: string;
+  color: string;
   total_tasks: number;
-  total_pending: string;
-  total_completed: string;
+  total_pending: number;
+  total_completed: number;
 };
 
 export type ProjectField = {
@@ -87,5 +100,5 @@ export type ProjectForm = {
   id: string;
   name: string;
   priority: 'high' | 'medium' | 'low';
-  image_url: string;
+  color: string;
 };

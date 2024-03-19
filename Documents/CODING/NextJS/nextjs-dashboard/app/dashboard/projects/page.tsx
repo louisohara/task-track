@@ -1,7 +1,7 @@
 import { fetchFilteredProjects } from '@/app/lib/data';
 import { projects } from '@/app/lib/placeholder-data';
 import ProjectsTable from '@/app/ui/projects/table';
-import { lusitana } from '@/app/ui/fonts';
+import { pavanam } from '@/app/ui/fonts';
 import Pagination from '@/app/ui/tasks/pagination';
 import Search from '@/app/ui/search';
 import { TableRowSkeleton } from '@/app/ui/skeletons';
@@ -15,7 +15,9 @@ export default async function Page({
   };
 }) {
   const query = searchParams?.query || '';
+
   const projects = await fetchFilteredProjects(query);
+
   return (
     <Suspense fallback={<TableRowSkeleton />}>
       <ProjectsTable projects={projects} />

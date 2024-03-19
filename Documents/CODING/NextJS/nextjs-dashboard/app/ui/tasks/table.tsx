@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import { UpdateTask, DeleteTask } from '@/app/ui/tasks/buttons';
 import TaskStatus from '@/app/ui/tasks/status';
-import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
+import { formatDateToLocal } from '@/app/lib/utils';
 import { fetchFilteredTasks } from '@/app/lib/data';
+import TaskPriority from './priority';
 
 export default async function TasksTable({
   query,
@@ -25,24 +26,27 @@ export default async function TasksTable({
               >
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
-                    <div className="mb-2 flex items-center">
-                      <Image
-                        src={task.image_url}
-                        className="mr-2 rounded-full"
-                        width={28}
-                        height={28}
-                        alt={`${task.name}'s profile picture`}
+                    <div className="mb-2 flex items-center gap-2">
+                      <div
+                        style={{ backgroundColor: task.color }}
+                        className="h-7 w-7 rounded-full border-2"
                       />
                       <p>{task.name}</p>
                     </div>
-                    <p className="text-sm text-gray-500">{task.priority}</p>
                   </div>
-                  <TaskStatus status={task.status} />
+
+                  <div className="flex gap-2">
+                    <p className="text-sm text-gray-500">
+                      {' '}
+                      <TaskPriority priority={task.priority} />
+                    </p>
+                    <TaskStatus status={task.status} />
+                  </div>
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
                   <div>
                     <p className="text-xl font-medium">{task.task}</p>
-                    <p>{formatDateToLocal(task.date)}</p>
+                    <p>{formatDateToLocal(task.due_date)}</p>
                   </div>
                   <div className="flex justify-end gap-2">
                     <UpdateTask id={task.id} />
@@ -55,17 +59,17 @@ export default async function TasksTable({
           <table className="hidden min-w-full text-gray-900 md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
               <tr>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Project
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Priority
-                </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Task
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Date
+                  Priority
+                </th>
+                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
+                  Project
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Date due
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Status
@@ -83,22 +87,19 @@ export default async function TasksTable({
                 >
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex items-center gap-3">
-                      <Image
-                        src={task.image_url}
-                        className="rounded-full"
-                        width={28}
-                        height={28}
-                        alt={`${task.name}'s profile picture`}
+                      <div
+                        style={{ backgroundColor: task.color }}
+                        className="h-7 w-7 rounded-full border-2"
                       />
-                      <p>{task.name}</p>
+                      <p>{task.task}</p>
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {task.priority}
+                    <TaskPriority priority={task.priority} />
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3">{task.task}</td>
+                  <td className="whitespace-nowrap px-6 py-3">{task.name}</td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {formatDateToLocal(task.date)}
+                    {formatDateToLocal(task.due_date)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     <TaskStatus status={task.status} />

@@ -29,7 +29,7 @@ export function CardsSkeleton() {
   );
 }
 
-export function RevenueChartSkeleton() {
+export function CalendarSkeleton() {
   return (
     <div className={`${shimmer} relative w-full overflow-hidden md:col-span-4`}>
       <div className="mb-4 h-8 w-36 rounded-md bg-gray-100" />
@@ -95,7 +95,7 @@ export default function DashboardSkeleton() {
         <CardSkeleton />
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-        <RevenueChartSkeleton />
+        <CalendarSkeleton />
         <LatestTasksSkeleton />
       </div>
     </>
@@ -179,17 +179,17 @@ export function TasksTableSkeleton() {
           <table className="hidden min-w-full text-gray-900 md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
               <tr>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Project
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Email
-                </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Task
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Date
+                  Priority
+                </th>
+                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
+                  Project
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Date due
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Status

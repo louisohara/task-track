@@ -22,6 +22,18 @@ export default function EditTaskForm({
   const initialState = { message: null, errors: {} };
   const updateTaskWithId = updateTask.bind(null, task.id);
   const [state, dispatch] = useFormState(updateTaskWithId, initialState);
+
+  const convertDate = (inputString: string) => {
+    const dateObject = new Date(inputString);
+
+    const day = String(dateObject.getDate()).padStart(2, '0');
+    const month = String(dateObject.getMonth() + 1).padStart(2, '0');
+    const year = dateObject.getFullYear();
+
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  };
+
   return (
     <form action={dispatch}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
@@ -70,7 +82,7 @@ export default function EditTaskForm({
                 step="0.01"
                 defaultValue={task.task}
                 placeholder="Enter task description"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500"
               />
             </div>
           </div>
@@ -87,7 +99,7 @@ export default function EditTaskForm({
           <legend className="mb-2 block text-sm font-medium">
             Set the task status
           </legend>
-          <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
+          <div className="mb-4 rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
               <div className="flex items-center">
                 <input
@@ -107,15 +119,15 @@ export default function EditTaskForm({
               </div>
               <div className="flex items-center">
                 <input
-                  id="pending"
+                  id="in progress"
                   name="status"
                   type="radio"
-                  value="pending"
+                  value="in progress"
                   defaultChecked={task.status === 'in progress'}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
-                  htmlFor="pending"
+                  htmlFor="in progress"
                   className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
                 >
                   In Progress <ClockIcon className="h-4 w-4" />
@@ -146,10 +158,33 @@ export default function EditTaskForm({
               </p>
             ))}
         </fieldset>
+        <div className="mb-0">
+          <label htmlFor="dueDate" className="mb-2 block text-sm font-medium">
+            Select a due date
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <input
+                id="dueDate"
+                name="dueDate"
+                type="date"
+                step="0.01"
+                defaultValue={convertDate(task.due_date.toString())}
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500"
+              />
+            </div>
+          </div>
+          {state.errors?.dueDate &&
+            state.errors.dueDate.map((error: string) => (
+              <p className="mt-2 text-sm text-red-500" key={error}>
+                {error}
+              </p>
+            ))}
+        </div>
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/Tasks"
+          href="/dashboard/tasks"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel

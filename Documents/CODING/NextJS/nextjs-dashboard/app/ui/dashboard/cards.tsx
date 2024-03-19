@@ -1,15 +1,15 @@
 import {
-  BanknotesIcon,
+  CheckCircleIcon,
   ClockIcon,
-  UserGroupIcon,
+  XCircleIcon,
   InboxIcon,
 } from '@heroicons/react/24/outline';
-import { lusitana } from '@/app/ui/fonts';
+import { pavanam } from '@/app/ui/fonts';
 import { fetchCardData } from '@/app/lib/data';
 
 const iconMap = {
-  completed: BanknotesIcon,
-  projects: UserGroupIcon,
+  completed: CheckCircleIcon,
+  incomplete: XCircleIcon,
   pending: ClockIcon,
   tasks: InboxIcon,
 };
@@ -23,12 +23,22 @@ export default async function CardWrapper() {
   } = await fetchCardData();
   return (
     <>
-      {/* NOTE: comment in this code when you get to this point in the course */}
-
-      <Card title="Completed" value={totalCompletedTasks} type="completed" />
-      <Card title="Pending" value={totalPendingTasks} type="pending" />
       <Card title="Total Tasks" value={numberOfTasks} type="tasks" />
-      <Card title="Total projects" value={numberOfProjects} type="projects" />
+      <Card
+        title="Tasks not started"
+        value={numberOfTasks - totalCompletedTasks - totalPendingTasks}
+        type="incomplete"
+      />
+      <Card
+        title="Tasks in progress"
+        value={totalPendingTasks}
+        type="pending"
+      />
+      <Card
+        title="Tasks completed"
+        value={totalCompletedTasks}
+        type="completed"
+      />
     </>
   );
 }
@@ -40,7 +50,7 @@ export function Card({
 }: {
   title: string;
   value: number | string;
-  type: 'tasks' | 'projects' | 'pending' | 'completed';
+  type: 'tasks' | 'incomplete' | 'pending' | 'completed';
 }) {
   const Icon = iconMap[type];
 
@@ -51,7 +61,7 @@ export function Card({
         <h3 className="ml-2 text-sm font-medium">{title}</h3>
       </div>
       <p
-        className={`${lusitana.className}
+        className={`${pavanam.className}
           truncate rounded-xl bg-white px-4 py-8 text-center text-2xl`}
       >
         {value}

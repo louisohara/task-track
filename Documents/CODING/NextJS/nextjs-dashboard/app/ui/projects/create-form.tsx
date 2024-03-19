@@ -4,10 +4,16 @@ import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { createProject } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
+import { useState } from 'react';
 
 export default function ProjectForm() {
+  const [currentColor, setCurrentColor] = useState<string>('#ffffff');
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(createProject, initialState);
+
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentColor(event.target.value);
+  };
   return (
     <form action={dispatch}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
@@ -25,7 +31,7 @@ export default function ProjectForm() {
                 step="0.01"
                 placeholder="Enter project name"
                 aria-describedby="name-error"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500"
               />
             </div>
           </div>
@@ -38,21 +44,57 @@ export default function ProjectForm() {
         </div>
 
         {/* Project priority */}
-        <div className="mb-4">
-          <label htmlFor="priority" className="mb-2 block text-sm font-medium">
-            Enter priority
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="priority"
-                name="priority"
-                type="string"
-                step="0.01"
-                placeholder="Enter project priority"
-                aria-describedby="priority-error"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              />
+        <fieldset className="mb-4">
+          <legend className="mb-2 block text-sm font-medium">
+            Select a priority
+          </legend>
+          <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
+            <div className="flex gap-4">
+              <div className="flex items-center">
+                <input
+                  id="low"
+                  name="priority"
+                  type="radio"
+                  value="low"
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                />
+                <label
+                  htmlFor="low"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1.5 text-xs font-medium text-yellow-600"
+                >
+                  Low
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="medium"
+                  name="priority"
+                  type="radio"
+                  value="medium"
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                />
+                <label
+                  htmlFor="medium"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1.5 text-xs font-medium text-orange-600"
+                >
+                  Medium
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="high"
+                  name="priority"
+                  type="radio"
+                  value="high"
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                />
+                <label
+                  htmlFor="high"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-medium text-white"
+                >
+                  High
+                </label>
+              </div>
             </div>
           </div>
           {state.errors?.priority &&
@@ -61,28 +103,30 @@ export default function ProjectForm() {
                 {error}
               </p>
             ))}
-        </div>
+        </fieldset>
 
-        {/* Project Image */}
-        <div className="mb-4">
-          <label htmlFor="image" className="mb-2 block text-sm font-medium">
-            Enter project image
+        {/* Project color */}
+        <div className="">
+          <label htmlFor="color" className="mb-2 block text-sm font-medium">
+            Select project color
           </label>
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
+            <div className="relative flex">
               <input
-                id="image"
-                name="imageUrl"
-                type="string"
+                id="color"
+                name="color"
+                type="color"
                 step="0.01"
-                placeholder="Enter image url"
-                aria-describedby="image_url-error"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                placeholder="Enter color"
+                aria-describedby="color-error"
+                onChange={handleColorChange}
+                style={{ backgroundColor: currentColor }}
+                className="peer block w-10 rounded-full border  border-gray-200 px-4 py-4 hover:cursor-pointer"
               />
             </div>
           </div>
-          {state.errors?.imageUrl &&
-            state.errors.imageUrl.map((error: string) => (
+          {state.errors?.color &&
+            state.errors.color.map((error: string) => (
               <p className="mt-2 text-sm text-red-500" key={error}>
                 {error}
               </p>

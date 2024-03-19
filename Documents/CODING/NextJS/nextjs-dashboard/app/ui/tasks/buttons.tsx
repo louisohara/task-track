@@ -30,9 +30,9 @@ export function DeleteTask({ id }: { id: string }) {
 
   return (
     <form action={deleteTaskWithId}>
-      <button className="rounded-md border p-2 hover:bg-gray-100">
+      <button className="hover:border-red rounded-md border p-2 text-red-500 hover:bg-red-100">
         <span className="sr-only">Delete</span>
-        <TrashIcon className="w-4" />
+        <TrashIcon className="w-5" />
       </button>
     </form>
   );
