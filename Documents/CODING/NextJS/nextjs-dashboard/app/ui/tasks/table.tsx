@@ -22,9 +22,9 @@ export default async function TasksTable({
             {tasks?.map((task) => (
               <div
                 key={task.id}
-                className="mb-2 w-full rounded-md bg-white p-4"
+                className="relative mb-2 w-full rounded-md bg-white p-4"
               >
-                <div className="flex items-center justify-between border-b pb-4">
+                <div className=" flex items-center justify-between border-b pb-4">
                   <div>
                     <div className="mb-2 flex items-center gap-2">
                       <div
@@ -48,7 +48,7 @@ export default async function TasksTable({
                     <p className="text-xl font-medium">{task.task}</p>
                     <p>{formatDateToLocal(task.due_date)}</p>
                   </div>
-                  <div className="flex justify-end gap-2">
+                  <div className="absolute bottom-2 right-4 flex justify-end gap-2">
                     <UpdateTask id={task.id} />
                     <DeleteTask id={task.id} />
                   </div>
@@ -105,7 +105,7 @@ export default async function TasksTable({
                     <TaskStatus status={task.status} />
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex justify-end gap-3">
+                    <div className="flex justify-end gap-3 ">
                       <UpdateTask id={task.id} />
                       <DeleteTask id={task.id} />
                     </div>

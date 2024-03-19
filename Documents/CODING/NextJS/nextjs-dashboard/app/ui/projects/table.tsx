@@ -16,7 +16,7 @@ export default async function ProjectsTable({
 }) {
   return (
     <div className="w-full">
-      <h1 className={`${pavanam.className} mb-8 text-2xl md:text-2xl`}>
+      <h1 className={`${pavanam.className} mb-4 text-2xl md:text-2xl`}>
         Projects
       </h1>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
@@ -31,11 +31,11 @@ export default async function ProjectsTable({
                 {projects?.map((project) => (
                   <div
                     key={project.id}
-                    className="mb-2 w-full rounded-md bg-white p-4"
+                    className="relative mb-2 w-full rounded-md bg-white p-4"
                   >
-                    <div className="flex items-center justify-between border-b pb-4">
-                      <div className="w-full">
-                        <div className="mb-2 flex w-full flex-row items-center justify-between">
+                    <div className=" flex items-center justify-between border-b pb-4">
+                      <div className="  w-full">
+                        <div className=" mb-2 flex w-full flex-row items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div
                               style={{ backgroundColor: project.color }}
@@ -69,7 +69,7 @@ export default async function ProjectsTable({
                     <div className="text-m m-0 pt-4">
                       <p>{project.total_tasks} tasks</p>
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <div className="absolute bottom-2 right-4 flex justify-end gap-2">
                       <UpdateProject id={project.id} />
                       <DeleteProject id={project.id} />
                     </div>
