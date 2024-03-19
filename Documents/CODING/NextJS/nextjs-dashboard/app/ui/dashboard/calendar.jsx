@@ -21,7 +21,7 @@ setOptions({
   theme: 'ios',
   themeVariant: 'light',
 });
-export default async function Calendar({ events }) {
+export default function Calendar({ events }) {
   const [isToastOpen, setToastOpen] = useState(false);
   const [toastText, setToastText] = useState();
 

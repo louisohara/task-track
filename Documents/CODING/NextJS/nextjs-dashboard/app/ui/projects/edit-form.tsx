@@ -51,7 +51,7 @@ export default function EditProjectForm({ project }: { project: ProjectForm }) {
         {/* Project priority */}
         <fieldset className="mb-4">
           <legend className="mb-2 block text-sm font-medium">
-            Set the project's priority
+            Set the project&apos;s priority
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
@@ -114,7 +114,7 @@ export default function EditProjectForm({ project }: { project: ProjectForm }) {
         </fieldset>
 
         {/* Project color */}
-        <div className="">
+        <div>
           <label htmlFor="color" className="mb-2 block text-sm font-medium">
             Select project color
           </label>
