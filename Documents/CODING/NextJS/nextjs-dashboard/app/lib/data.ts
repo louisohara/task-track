@@ -231,7 +231,7 @@ export async function fetchFilteredProjects(query: string) {
       projects.priority,
       projects.color,
       COUNT(tasks.id) AS total_tasks,
-    SUM(CASE WHEN tasks.status = 'in progress' THEN 1 ELSE 0 END) AS total_pending,
+    SUM(CASE WHEN tasks.status IN ('in progress', 'not started') THEN 1 ELSE 0 END) AS total_pending,
     SUM(CASE WHEN tasks.status = 'completed' THEN 1 ELSE 0 END) AS total_completed
     FROM projects
     LEFT JOIN tasks ON tasks.project_id = projects.id
@@ -245,7 +245,6 @@ WHERE
 
     const projects = data.rows.map((project) => ({
       ...project,
-
       total_pending: project.total_pending,
       total_completed: project.total_completed,
     }));
